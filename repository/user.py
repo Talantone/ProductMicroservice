@@ -1,56 +1,46 @@
 from typing import List, Optional
-from db.users import users
-from models.user import User, UserIn
-from .base import BaseRepository
+
+import sqlalchemy
+
+from db.users import User
+import models.user
+from sqlalchemy.orm import Session
 from core.security import hash_password
-import datetime
 
 
-class UserRepository(BaseRepository):
+async def get_all(db: Session, limit: int = 100, skip: int = 0):
+    return db.query(User).offset(skip).limit(limit).all()
 
-    async def get_all(self, limit: int = 100, skip: int = 0) -> List[User]:
-        query = users.select().limit(limit).offset(skip)
-        return await self.database.fetch_all(query=query)
 
-    async def get_by_id(self, id: int) -> Optional[User]:
-        query = users.select().where(users.c.id == id).first()
-        user = await self.database.fetch_one(query)
-        if user is None:
-            return None
-        return User.parse_obj(user)
+async def get_by_id(db: Session, user_id: int) -> Optional[models.user.User]:
+    return db.query(User).filter(User.id == user_id).first()
 
-    async def create(self, u: UserIn) -> User:
-        user = User(
-            email=u.email,
-            hashed_password=hash_password(u.password),
 
-        )
+async def create(db: Session, u: models.user.UserIn) -> models.user.User:
+    user = User(
+        email=u.email,
+        hashed_password=hash_password(u.password)
+    )
 
-        values = {**user.dict()}
-        values.pop("id", None)
-        query = users.insert().values(**values)
-        user.id = await self.database.execute(query)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
-        return user
 
-    async def update(self, id: int, u: UserIn) -> User:
-        user = User(
-            id=id,
-            email=u.email,
-            hashed_password=hash_password(u.password),
+async def update(db: Session, user_id: int, u: models.user.UserUpdate) -> models.user.User:
+    user = models.user.User(
+        id=user_id,
+        email=u.email,
+        hashed_password=hash_password(u.password),
 
-        )
+    )
+    values = {**user.dict()}
+    values.pop("id", None)
+    db.execute(sqlalchemy.update(User).where(User.id == user_id).values(**values))
 
-        values = {**user.dict()}
-        values.pop("id", None)
-        query = users.update().where(users.c.id == id).values(**values)
-        await self.database.execute(query)
+    return user
 
-        return user
 
-    async def get_by_email(self, email: str) -> Optional[User]:
-        query = users.select().where(users.c.email == email)
-        user = await self.database.fetch_one(query)
-        if user is None:
-            return None
-        return User.parse_obj(user)
+async def get_by_email(db: Session, email: str) -> Optional[User]:
+    return db.query(User).filter(User.email == email).first()

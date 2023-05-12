@@ -1,19 +1,24 @@
+import uuid
+
 import sqlalchemy
-from base import metadata
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
-products = sqlalchemy.Table(
-    "products",
-    metadata,
-    sqlalchemy.Column("UUID", sqlalchemy.UUID, primary_key=True, unique=True),
-    sqlalchemy.Column("name", sqlalchemy.String, primary_key=True, unique=True),
-    sqlalchemy.Column("description", sqlalchemy.String)
-)
+from .base import metadata, Base
 
-offers = sqlalchemy.Table(
-    "offers",
-    metadata,
-    sqlalchemy.Column("UUID", sqlalchemy.UUID, primary_key=True, unique=True),
-    sqlalchemy.Column("product_id", sqlalchemy.UUID, sqlalchemy.ForeignKey(products.UUID), nullable=False),
-    sqlalchemy.Column("price", sqlalchemy.Integer),
-    sqlalchemy.Column("items_in_stock", sqlalchemy.Integer)
-)
+
+class Product(Base):
+    __tablename__ = "products"
+    UUID = sqlalchemy.Column(sqlalchemy.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
+    name = sqlalchemy.Column(sqlalchemy.String, primary_key=True, unique=True)
+    description = sqlalchemy.Column(sqlalchemy.String)
+    offers = relationship("Offer", back_populates="product")
+
+
+class Offer(Base):
+    __tablename__ = "offers"
+    UUID = sqlalchemy.Column(sqlalchemy.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    product_id = sqlalchemy.Column(sqlalchemy.UUID, ForeignKey(Product.UUID), nullable=False)
+    price = sqlalchemy.Column(sqlalchemy.Integer)
+    items_in_stock = sqlalchemy.Column(sqlalchemy.Integer)
+    product = relationship("Product", back_populates="offers")

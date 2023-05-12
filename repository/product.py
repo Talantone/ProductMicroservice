@@ -1,49 +1,45 @@
 from typing import List, Optional
 
-from models.product import Product, ProductIn
-from db.products import products
-from base import BaseRepository
+import sqlalchemy
+from sqlalchemy.orm import Session
+
+from models.product import ProductSchema, ProductInSchema
+from db.products import Product
 
 
-class ProductRepository(BaseRepository):
+async def create(db: Session, p: ProductInSchema) -> ProductSchema:
+    product = Product(
+        name=p.name,
+        description=p.description
+    )
+    db.add(product)
+    db.commit()
+    db.refresh(product)
+    return ProductSchema(id=product.UUID, name=product.name, description=product.description)
 
-    async def create(self, p: ProductIn) -> Product:
-        product = Product(
-            id=0,
-            title=p.name,
-            description=p.description,
 
-        )
-        values = {**product.dict()}
-        values.pop("id", None)
-        query = products.insert().values(**values)
-        product.id = await self.database.execute(query=query)
-        return product
+async def update(db: Session, product_id: str, p: ProductInSchema) -> ProductSchema:
+    product = ProductSchema(
+        title=p.name,
+        description=p.description,
+    )
+    values = {**product.dict()}
 
-    async def update(self, id: str, p: ProductIn) -> Product:
-        product = Product(
-            id=id,
-            title=p.name,
-            description=p.description,
-        )
-        values = {**product.dict()}
-        values.pop("id", None)
-        values.pop("created_at", None)
-        query = products.update().where(products.c.id == id).values(**values)
-        await self.database.execute(query=query)
-        return product
+    db.execute(sqlalchemy.update(Product).where(Product.UUID == product_id).values(**values))
 
-    async def get_all(self, limit: int = 100, skip: int = 0) -> List[Product]:
-        query = products.select().limit(limit).offset(skip)
-        return await self.database.fetch_all(query=query)
+    return product
 
-    async def delete(self, id: int):
-        query = products.delete().where(products.c.id == id)
-        return await self.database.execute(query=query)
 
-    async def get_by_id(self, id: int) -> Optional[Product]:
-        query = products.select().where(products.c.id == id)
-        product = await self.database.fetch_one(query=query)
-        if product is None:
-            return None
-        return Product.parse_obj(product)
+async def get_all(db: Session, limit: int = 100, skip: int = 0):
+    return db.query(Product).offset(skip).limit(limit).all()
+
+
+async def delete(db: Session, product_id: str):
+    product = db.query(Product).filter(Product.UUID == product_id).first()
+    db.delete(product)
+    db.commit()
+
+
+async def get_by_id(db: Session, product_id: str) -> Optional[ProductSchema]:
+    product = db.query(Product).filter(Product.UUID == product_id).first()
+    return product

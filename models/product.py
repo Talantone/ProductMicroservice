@@ -1,20 +1,27 @@
+import uuid
 from typing import Optional
 from pydantic import BaseModel
 
 
-class Product(BaseModel):
-    id: Optional[str] = None
+class ProductSchema(BaseModel):
+    UUID: Optional[uuid.UUID]
     name: str
     description: str
 
+    class Config:
+        orm_mode = True
 
-class Offer(BaseModel):
-    id: Optional[str] = None
+
+class OfferSchema(BaseModel):
+    UUID: Optional[str] = None
     product_id: str
     name: str
     items_in_stock: int
 
+    class Config:
+        orm_mode = True
 
-class ProductIn(BaseModel):
+
+class ProductInSchema(BaseModel):
     name: str
     description: str

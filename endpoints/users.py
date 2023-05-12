@@ -1,34 +1,38 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
-from repository.user import UserRepository
+from sqlalchemy.orm import Session
+from db.base import get_db
+from db.base import SessionLocal
+from repository.user import get_all, get_by_id, get_by_email, create, update
 from models.user import User, UserIn
-from depends import get_user_repository, get_current_user
+from .depends import get_current_user
 
 router = APIRouter()
 
 
 @router.get("/", response_model=List[User])
 async def read_users(
-        users: UserRepository = Depends(get_user_repository),
+        db: Session = Depends(get_db),
         limit: int = 100,
         skip: int = 0):
-    return await users.get_all(limit=limit, skip=0)
+    return await get_all(db=db, limit=limit, skip=skip)
 
 
 @router.post("/", response_model=User)
 async def create_user(
         user: UserIn,
-        users: UserRepository = Depends(get_user_repository)):
-    return await users.create(u=user)
+        db: Session = Depends(get_db)):
+
+    return await create(db=db, u=user)
 
 
 @router.put("/", response_model=User)
 async def update_user(
-        id: int,
+        user_id: int,
         user: UserIn,
-        users: UserRepository = Depends(get_user_repository),
+        db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)):
-    old_user = await users.get_by_id(id=id)
+    old_user = await get_by_id(db=db, user_id=user_id)
     if old_user is None or old_user.email != current_user.email:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found user")
-    return await users.update(id=id, u=user)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return await update(db=db, user_id=user_id, u=user)

@@ -1,23 +1,29 @@
 from typing import Any
 
 from fastapi import Depends, HTTPException, status
-from repositories.users import UserRepository
-from repositories.jobs import JobRepository
-from db.base import database
+from sqlalchemy.orm import Session
+
+from repository.user import get_by_email
+
+from db.base import get_db
 from core.security import JWTBearer, decode_access_token
 from models.user import User
 
 
-def get_user_repository() -> UserRepository:
-    return UserRepository(database)
+#def get_user_repository() -> UserRepository:
+ #   return UserRepository(database)
 
 
-def get_job_repository() -> JobRepository:
-    return JobRepository(database)
+#def get_product_repository() -> ProductRepository:
+#   return ProductRepository(database)
+
+
+#def get_offer_repository() -> OfferRepository:
+#    return OfferRepository(database)
 
 
 async def get_current_user(
-        users: UserRepository = Depends(get_user_repository),
+        db: Session = Depends(get_db),
         token: str = Depends(JWTBearer()),
 ) -> HTTPException | Any:
     cred_exception = HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Credentials are not valid")
@@ -27,7 +33,7 @@ async def get_current_user(
     email: str = payload.get("sub")
     if email is None:
         raise cred_exception
-    user = await users.get_by_email(email=email)
+    user = await get_by_email(db=db, email=email)
     if user is None:
         return cred_exception
     return user

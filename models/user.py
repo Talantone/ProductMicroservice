@@ -1,11 +1,16 @@
 from typing import Optional
+
+import pydantic
 from pydantic import BaseModel, EmailStr, validator, constr
 
 
 class User(BaseModel):
-    id: Optional[str] = None
+    id: Optional[int] = None
     email: EmailStr
     hashed_password: str
+
+    class Config:
+        orm_mode = True
 
 
 class UserIn(BaseModel):
@@ -19,3 +24,9 @@ class UserIn(BaseModel):
         if ("password" in values) and (v != values["password"]):
             raise ValueError("passwords don't match")
         return v
+
+
+class UserUpdate(BaseModel):
+    name: Optional[str]
+    email: Optional[EmailStr]
+    password: Optional[constr(min_length=8)]

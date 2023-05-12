@@ -1,11 +1,9 @@
 import sqlalchemy
-from base import metadata
+from .base import metadata, Base
 
 
-users = sqlalchemy.Table(
-    "users",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True),
-    sqlalchemy.Column("email", sqlalchemy.String, primary_key=True, unique=True),
-    sqlalchemy.Column("hashed_password", sqlalchemy.String),
-)
+class User(Base):
+    __tablename__ = "users"
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True)
+    email = sqlalchemy.Column(sqlalchemy.String, primary_key=True, unique=True)
+    hashed_password = sqlalchemy.Column(sqlalchemy.String)
