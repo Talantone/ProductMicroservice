@@ -17,7 +17,7 @@ class Product(Base):
 
 class Offer(Base):
     __tablename__ = "offers"
-    UUID = sqlalchemy.Column(sqlalchemy.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = sqlalchemy.Column(sqlalchemy.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     product_id = sqlalchemy.Column(sqlalchemy.UUID, ForeignKey(Product.UUID), nullable=False)
     price = sqlalchemy.Column(sqlalchemy.Integer)
     items_in_stock = sqlalchemy.Column(sqlalchemy.Integer)

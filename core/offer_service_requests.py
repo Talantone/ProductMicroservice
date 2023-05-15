@@ -5,11 +5,11 @@ from .config import SERVICE_URL, SERVICE_REFRESH
 
 
 async def send_get_request_offers(product_id, access):
-    r = requests.get(SERVICE_URL + "/products/{}/offers".format(product_id),
+    r = requests.get(SERVICE_URL + "/products/{product_id}/offers".format(product_id=product_id),
                      headers={'Accept': 'application/json',
                               'Bearer': access})
 
-    return f"Status Code: {r.status_code}, Content: {r.json()}"
+    return r.json()#f"Status Code: {r.status_code}, Content: {r.json()}"  r.json()
 
 
 async def send_post_request_access():
@@ -25,6 +25,10 @@ async def send_post_request_register_product(product: ProductSchema, access):
     r = requests.post(SERVICE_URL + "/products/register",
                       headers={'Accept': 'application/json',
                                'Bearer': access},
-                      json={**product.dict()})
+                      json={"id": product.UUID,
+                            "name": product.name,
+                            "description": product.description})
 
     return f"Status Code: {r.status_code}, Content: {r.json()}"
+
+

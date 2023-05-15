@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class ProductSchema(BaseModel):
-    UUID: Optional[uuid.UUID]
+    UUID: Optional[str] | Optional[uuid.UUID]
     name: str
     description: str
 
@@ -13,9 +13,18 @@ class ProductSchema(BaseModel):
 
 
 class OfferSchema(BaseModel):
-    UUID: Optional[str] = None
+    id: Optional[str] | Optional[uuid.UUID]
     product_id: str
-    name: str
+    price: int
+    items_in_stock: int
+
+    class Config:
+        orm_mode = True
+
+
+class OfferOutSchema(BaseModel):
+    id: Optional[str] | Optional[uuid.UUID]
+    price: int
     items_in_stock: int
 
     class Config:
