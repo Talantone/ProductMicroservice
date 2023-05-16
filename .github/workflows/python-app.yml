@@ -13,9 +13,10 @@ permissions:
   contents: read
 
 jobs:
-  container-job:
+ 
+  build:
+
     runs-on: ubuntu-latest
-    
     services:
       # Label used to access the service container
       postgres:
@@ -23,13 +24,10 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
+          POSTGRES_PORT: 5432
           POSTGRES_DB: product-test-db
           POSTGRES_USER: root
           POSTGRES_PASSWORD: qwerty
-  
-  build:
-
-    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
