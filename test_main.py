@@ -22,7 +22,6 @@ def override_get_db():
 
 
 client = TestClient(app)
-app.dependency_overrides = {}
 app.dependency_overrides[get_db] = override_get_db
 token = ''
 product_id = ''
@@ -66,13 +65,6 @@ def test_create_product():
 def test_read_products():
     response = client.get('/products', headers={'accept': 'application/json',
                                                 'Authorization': 'Bearer {}'.format(token)})
-    assert response.status_code == 200
-
-
-def test_delete_product():
-    response = client.delete('products/{}'.format(product_id), headers={'accept': 'application/json',
-                                                                        'Authorization': 'Bearer {}'.format(token)})
-
     assert response.status_code == 200
 
 

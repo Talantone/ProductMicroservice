@@ -8,6 +8,6 @@ services:
       - .data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      POSTGRES_PASSWORD: qwerty
       POSTGRES_DB: product_db
 
