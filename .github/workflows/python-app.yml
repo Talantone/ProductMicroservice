@@ -24,7 +24,7 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
-          POSTGRES_PORT: 5432
+          POSTGRES_PORT: 5433
           POSTGRES_DB: product-test-db
           POSTGRES_USER: root
           POSTGRES_PASSWORD: qwerty
