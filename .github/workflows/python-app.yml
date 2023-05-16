@@ -13,6 +13,20 @@ permissions:
   contents: read
 
 jobs:
+  container-job:
+    runs-on: ubuntu-latest
+    
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_DB: product-test-db
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: qwerty
+  
   build:
 
     runs-on: ubuntu-latest
