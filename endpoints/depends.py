@@ -7,19 +7,6 @@ from repository.user import get_by_email
 
 from db.base import get_db
 from core.security import JWTBearer, decode_access_token
-from models.user import User
-
-
-#def get_user_repository() -> UserRepository:
- #   return UserRepository(database)
-
-
-#def get_product_repository() -> ProductRepository:
-#   return ProductRepository(database)
-
-
-#def get_offer_repository() -> OfferRepository:
-#    return OfferRepository(database)
 
 
 async def get_current_user(

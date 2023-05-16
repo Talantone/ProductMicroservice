@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from core.security import verify_password, create_access_token
-#from endpoints.depends import get_user_repository
 from models.token import Token, Login
 from repository.user import get_by_email
 from db.base import get_db

@@ -3,6 +3,7 @@ from starlette.config import Config
 config = Config(".env")
 
 DB_URL = config("DB_URL", cast=str, default="localhost:5432")
+TEST_DB_URL = config("DB_URL", cast=str, default='localhost:5433')
 ACCESS_EXPIRATION = config("ACCESS_EXPIRATION", cast=int, default=60)
 APP_PORT = config("APP_PORT", cast=int, default=8000)
 APP_ADDR = config("APP_ADDR", cast=str, default="localhost")

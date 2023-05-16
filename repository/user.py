@@ -44,3 +44,7 @@ async def update(db: Session, user_id: int, u: models.user.UserUpdate) -> models
 
 async def get_by_email(db: Session, email: str) -> Optional[User]:
     return db.query(User).filter(User.email == email).first()
+
+
+async def delete(db: Session, user_id: int):
+    return db.query(User).filter(User.id == user_id).delete()
