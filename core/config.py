@@ -2,7 +2,7 @@ from starlette.config import Config
 
 config = Config(".env")
 
-DB_URL = config("DB_URL", cast=str, default="postgresql://root:qwerty@localhost:5432/product-db")
+DB_URL = config("DB_URL", cast=str, default="postgresql://root:qwerty@localhost:5433/product-db")
 TEST_DB_URL = config("DB_URL", cast=str, default='postgresql://root:qwerty@localhost:5433/product-test-db')
 ACCESS_EXPIRATION = config("ACCESS_EXPIRATION", cast=int, default=60)
 APP_PORT = config("APP_PORT", cast=int, default=8000)

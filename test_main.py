@@ -6,11 +6,9 @@ from core.config import TEST_DB_URL
 from db.base import Base, get_db
 from main import app
 
-
 engine = create_engine(
     TEST_DB_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 
 Base.metadata.create_all(bind=engine)
 
@@ -23,8 +21,9 @@ def override_get_db():
         db.close()
 
 
-app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
+app.dependency_overrides = {}
+app.dependency_overrides[get_db] = override_get_db
 token = ''
 product_id = ''
 
@@ -72,13 +71,12 @@ def test_read_products():
 
 def test_delete_product():
     response = client.delete('products/{}'.format(product_id), headers={'accept': 'application/json',
-                                                  'Authorization': 'Bearer {}'.format(token)})
+                                                                        'Authorization': 'Bearer {}'.format(token)})
+
+    assert response.status_code == 200
 
 
 def test_delete_user():
     response = client.delete('/users/{}'.format('1'), headers={'accept': 'application/json',
                                                                'Authorization': 'Bearer {}'.format(token)})
     assert response.status_code == 200
-
-
-
