@@ -1,13 +1,26 @@
-version: '3'
+version: '3.8'
+
 services:
+
+  app:
+    build: .
+    command: ./wait_for_postgres.sh db python main.py
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DB_URL=postgresql://root:qwerty@localhost:5432/product-db
+      - DB_USER=root
+      - DB_PASSWORD=qwerty
+
   db:
+    restart: always
     image: postgres:latest
+    volumes:
+      - ./.database/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=qwerty
     ports:
       - "5432:5432"
-    volumes:
-      - .data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: qwerty
-      POSTGRES_DB: product_db
-

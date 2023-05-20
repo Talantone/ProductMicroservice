@@ -1,5 +1,9 @@
-FROM postgres
-ENV POSTGRES_USER root
-ENV POSTGRES_PASSWORD qwerty
-ENV POSTGRES_DB product_db
-COPY product_db.sql /docker-entrypoint-initdb.d/
+FROM python:3
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+COPY ./ ./
+COPY wait_for_postgres.sh ./
+RUN chmod +x wait_for_postgres.sh
+RUN pip3 install -r requirements.txt
+RUN apt-get update
+RUN apt-get -y install postgresql-client
